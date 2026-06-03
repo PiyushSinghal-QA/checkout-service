@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acme Checkout</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="logo">🛒</span> Acme<span class="accent">Checkout</span></div>
+      <div class="env"><span class="dot"></span> checkout-service · <span id="health">live</span></div>
+    </header>
+
+    <main class="shop">
+      <section class="catalog">
+        <h2>Shop</h2>
+        <div id="products" class="product-grid"><div class="loading">Loading products…</div></div>
+      </section>
+
+      <aside class="cart">
+        <h2>Your cart</h2>
+        <div id="cartItems" class="cart-items"><p class="empty">Your cart is empty — add something nice.</p></div>
+        <div id="summary" class="summary"></div>
+        <div class="form">
+          <input id="customerName" type="text" placeholder="Your name" value="Ada Lovelace" />
+          <input id="coupon" type="text" placeholder="Coupon code (try SAVE10)" />
+          <button id="placeOrder" disabled>Place order</button>
+          <p id="formError" class="form-error hidden"></p>
+        </div>
+      </aside>
+    </main>
+
+    <div id="overlay" class="overlay hidden">
+      <div class="receipt" id="receipt"></div>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
