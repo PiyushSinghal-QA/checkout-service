@@ -1,0 +1,77 @@
+name: AutoFix
+
+# Manually trigger a fix for a seeded bug. The agent detects → fixes →
+# validates (builds the app + runs checkout-e2e) → opens a real PR.
+on:
+  workflow_dispatch:
+    inputs:
+      bug:
+        description: Which seeded bug to fix
+        required: true
+        type: choice
+        options:
+          - null-check
+          - typo
+          - wrong-import
+          - missing-validation
+          - unhandled-error
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout app (full history, all branches)
+        uses: actions/checkout@v4
+        with:
+          path: checkout-service
+          fetch-depth: 0
+      - name: Checkout test suite
+        uses: actions/checkout@v4
+        with:
+          repository: PiyushSinghal-QA/checkout-e2e
+          path: checkout-e2e
+      - name: Checkout agent
+        uses: actions/checkout@v4
+        with:
+          repository: PiyushSinghal-QA/autofix-agent
+          path: autofix-agent
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Make bug branches available locally
+        working-directory: checkout-service
+        shell: bash
+        run: |
+          git fetch origin '+refs/heads/*:refs/remotes/origin/*'
+          for r in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin/bug); do
+            git branch -f "${r#origin/}" "$r"
+          done
+          echo "local bug branches:"; git branch --list 'bug/*'
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          npm install --prefix checkout-service
+          npm install --prefix checkout-e2e
+          npm install --prefix autofix-agent
+          npx --prefix checkout-e2e playwright install --with-deps chromium
+
+      - name: Run AutoFix (detect → fix → validate → PR)
+        working-directory: autofix-agent
+        env:
+          AI_PROVIDER: mock
+          DRY_RUN: 'false'
+          APP_PATH: ../checkout-service
+          E2E_PATH: ../checkout-e2e
+          APP_PORT: '3100'
+          GITHUB_OWNER: PiyushSinghal-QA
+          GITHUB_REPO: checkout-service
+          GITHUB_DEFAULT_REVIEWER: ''
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run pipeline -- ${{ inputs.bug }}
