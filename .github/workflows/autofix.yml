@@ -44,16 +44,6 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Make bug branches available locally
-        working-directory: checkout-service
-        shell: bash
-        run: |
-          git fetch origin '+refs/heads/*:refs/remotes/origin/*'
-          for r in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin/bug); do
-            git branch -f "${r#origin/}" "$r"
-          done
-          echo "local bug branches:"; git branch --list 'bug/*'
-
       - name: Install dependencies
         shell: bash
         run: |
