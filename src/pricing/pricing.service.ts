@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { CartItem } from '../cart/cart.service';
-import { calcTax } from './tax';
+import { calcTax } from './tax.legacy';
 
 export interface PriceBreakdown {
   subtotal: number;

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CartService } from '../cart/cart.service';
 import { PricingService } from '../pricing/pricing.service';
 import { PaymentGateway } from '../payment/payment.gateway';
@@ -14,12 +14,7 @@ export class CheckoutService {
   ) {}
 
   async checkout(dto: CheckoutDto) {
-    const cart = this.carts.find(dto.cartId);
-
-    // [bug/null-check] removes this guard → `cart.items` below throws → 500.
-    if (!cart) {
-      throw new NotFoundException(`Cart ${dto.cartId} not found`);
-    }
+    const cart = this.carts.find(dto.cartId)!;
 
     if (cart.items.length === 0) {
       throw new BadRequestException('Cannot check out an empty cart');
@@ -30,13 +25,7 @@ export class CheckoutService {
       dto.couponCode,
     );
 
-    // [bug/unhandled-error] removes this try/catch → a decline becomes a 500.
-    let receipt;
-    try {
-      receipt = await this.payment.charge({ amount: total, customer: dto.customer });
-    } catch (err) {
-      throw new BadRequestException(`Payment failed: ${(err as Error).message}`);
-    }
+    const receipt = await this.payment.charge({ amount: total, customer: dto.customer });
 
     return {
       orderId: receipt.reference,
@@ -47,8 +36,7 @@ export class CheckoutService {
       discount,
       tax,
       total,
-      // [bug/typo] ships this key as `formatedTotal` → API consumers read undefined.
-      formattedTotal: formatMoney(total),
+      formatedTotal: formatMoney(total),
       status: 'confirmed',
     };
   }
