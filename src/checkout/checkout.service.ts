@@ -36,7 +36,7 @@ export class CheckoutService {
       discount,
       tax,
       total,
-      formatedTotal: formatMoney(total),
+      formattedTotal: formatMoney(total),
       status: 'confirmed',
     };
   }
