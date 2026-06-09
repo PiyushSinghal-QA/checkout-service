@@ -48,7 +48,7 @@ export class CheckoutService {
       tax,
       total,
       // [bug/typo] ships this key as `formatedTotal` → API consumers read undefined.
-      formatedTotal: formatMoney(total),
+      formattedTotal: formatMoney(total),
       status: 'confirmed',
     };
   }
