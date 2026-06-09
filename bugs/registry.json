@@ -4,57 +4,57 @@
   "bugs": [
     {
       "id": "null-check",
-      "branch": "bug/null-check",
+      "branch": "main",
       "title": "Checkout returns 500 when the cart does not exist",
       "category": "missing-null-undefined-check",
       "severity": "high",
       "files": ["src/checkout/checkout.service.ts"],
       "failingTest": "returns 404 when the cart does not exist",
-      "testFile": "test/checkout.e2e-spec.ts",
+      "testFile": "tests/api.spec.ts",
       "description": "CheckoutService.checkout() dereferences cart.items before confirming the cart was found, so an unknown cartId throws a TypeError and the API returns HTTP 500 instead of a clean 404."
     },
     {
       "id": "typo",
-      "branch": "bug/typo",
+      "branch": "main",
       "title": "Checkout response omits formattedTotal (misspelled property)",
       "category": "typo-in-property-name",
       "severity": "low",
       "files": ["src/checkout/checkout.service.ts"],
       "failingTest": "returns a human-readable formattedTotal",
-      "testFile": "test/checkout.e2e-spec.ts",
+      "testFile": "tests/api.spec.ts",
       "description": "The checkout response ships the key as 'formatedTotal' instead of 'formattedTotal', so every API consumer reads undefined for the human-readable total."
     },
     {
       "id": "wrong-import",
-      "branch": "bug/wrong-import",
+      "branch": "main",
       "title": "Pricing imports the legacy 5% tax module, undercharging VAT",
       "category": "wrong-broken-import-path",
       "severity": "high",
       "files": ["src/pricing/pricing.service.ts"],
       "failingTest": "applies 20% VAT to the taxable total",
-      "testFile": "test/checkout.e2e-spec.ts",
+      "testFile": "tests/api.spec.ts",
       "description": "PricingService imports calcTax from './tax.legacy' (the retired 5% rate) instead of './tax' (current 20% VAT), so every order is taxed at the wrong rate."
     },
     {
       "id": "missing-validation",
-      "branch": "bug/missing-validation",
+      "branch": "main",
       "title": "Checkout accepts an empty customer name (no input validation)",
       "category": "missing-input-validation-guard",
       "severity": "medium",
       "files": ["src/app.module.ts"],
       "failingTest": "rejects checkout with an empty customer name (400)",
-      "testFile": "test/checkout.e2e-spec.ts",
+      "testFile": "tests/api.spec.ts",
       "description": "The global ValidationPipe (APP_PIPE) was removed from AppModule, so malformed payloads such as an empty customer name are accepted and produce a confirmed order instead of a 400."
     },
     {
       "id": "unhandled-error",
-      "branch": "bug/unhandled-error",
+      "branch": "main",
       "title": "Declined payment crashes checkout with a 500",
       "category": "unhandled-api-error-missing-try-catch",
       "severity": "high",
       "files": ["src/checkout/checkout.service.ts"],
       "failingTest": "returns 400 when the payment is declined",
-      "testFile": "test/checkout.e2e-spec.ts",
+      "testFile": "tests/api.spec.ts",
       "description": "The call to PaymentGateway.charge() is not wrapped in try/catch, so a declined card throws and the API returns HTTP 500 instead of a clean 400 with a payment-failed message."
     }
   ]
