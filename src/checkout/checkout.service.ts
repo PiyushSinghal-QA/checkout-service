@@ -25,7 +25,12 @@ export class CheckoutService {
       dto.couponCode,
     );
 
-    const receipt = await this.payment.charge({ amount: total, customer: dto.customer });
+    let receipt;
+    try {
+      receipt = await this.payment.charge({ amount: total, customer: dto.customer });
+    } catch (err) {
+      throw new BadRequestException(`Payment failed: ${(err as Error).message}`);
+    }
 
     return {
       orderId: receipt.reference,
