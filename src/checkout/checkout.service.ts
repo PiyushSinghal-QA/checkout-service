@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CartService } from '../cart/cart.service';
 import { PricingService } from '../pricing/pricing.service';
 import { PaymentGateway } from '../payment/payment.gateway';
@@ -14,7 +14,11 @@ export class CheckoutService {
   ) {}
 
   async checkout(dto: CheckoutDto) {
-    const cart = this.carts.find(dto.cartId)!;
+    const cart = this.carts.find(dto.cartId);
+
+    if (!cart) {
+      throw new NotFoundException(`Cart ${dto.cartId} not found`);
+    }
 
     if (cart.items.length === 0) {
       throw new BadRequestException('Cannot check out an empty cart');
